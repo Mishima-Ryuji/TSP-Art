@@ -1,3 +1,4 @@
+import { TTwoOpt } from 'lib/twoOpt/TTwoOpt'
 import { useEffect, useRef, useState } from 'react'
 
 type Props = {
@@ -6,19 +7,19 @@ type Props = {
   onFinish: (tourHistory: number[][]) => void
 }
 
-const STEP = 10
+const INTERVAL = 10
 
-const NUM_OF_CITIES = 1000
+const NUM_OF_CITIES = 10000
 
 export const ArtCanvas = ({ onFinish: handleFinish, imagePath }: Props) => {
   const ref = useRef<HTMLCanvasElement>(null!)
 
-  // const searchInstance = useRef<>(null!)
-  const [currentTour, setCurrentTour] = useState([])
-  // const tourHistory = useRef<number[][]>([])
+  const searchInstance = useRef<TTwoOpt>(null!)
+  const citiesRef = useRef<number[][]>([])
+  const [currentTour, setCurrentTour] = useState<number[]>([])
+  const tourHistory = useRef<number[][]>([])
 
   useEffect(() => {
-    //   searchInstance.current =
     const canvas = ref.current
     let image = new Image()
     image.src = imagePath
@@ -47,7 +48,6 @@ export const ArtCanvas = ({ onFinish: handleFinish, imagePath }: Props) => {
       }
     }
 
-    const rgbAverage = rgbSum / (pixels.height * pixels.width)
     let alpha = 1
     if (rgbSum / 255 > NUM_OF_CITIES) {
       alpha = NUM_OF_CITIES / (rgbSum / 255)
@@ -63,17 +63,44 @@ export const ArtCanvas = ({ onFinish: handleFinish, imagePath }: Props) => {
         }
       }
     }
+    citiesRef.current = cities
 
     ctx.putImageData(pixels, 0, 0, 0, 0, pixels.width, pixels.height)
 
-    //   const initTour = searchInstance.current.initialize()
-    //   setCurrentTour(initTour)
-    //   tourHistory.current = [initTour]
+    // 都市データをTwoOptに登録
+    searchInstance.current = new TTwoOpt(INTERVAL, cities)
+
+    const initTour = searchInstance.current.initialize()
+    setCurrentTour(initTour)
+    tourHistory.current = []
   }, [imagePath])
 
   useEffect(() => {
     if (currentTour.length === 0) return
+    tourHistory.current.push(currentTour)
+    const canvas = ref.current
+    const ctx = canvas.getContext('2d')
+    if (ctx === null) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.beginPath()
+    const tourLength = searchInstance.current.fTour.fCitiesTour.length
+    for (let cityIndex = 0; cityIndex < tourLength; cityIndex++) {
+      const cityId = searchInstance.current.fTour.fCitiesTour[cityIndex]
+      if (cityIndex === 0)
+        ctx.moveTo(citiesRef.current[cityId][0], citiesRef.current[cityId][1])
+      else
+        ctx.lineTo(citiesRef.current[cityId][0], citiesRef.current[cityId][1])
+    }
+    ctx.strokeStyle = 'black'
+    ctx.lineWidth = 0.1
+    ctx.stroke()
+    if (searchInstance.current.isFinished()) {
+      handleFinish(tourHistory.current)
+    } else {
+      const nextTour = [...searchInstance.current.next(currentTour)]
+      setCurrentTour(nextTour)
+    }
   }, [currentTour])
 
-  return <canvas ref={ref} className="w-100" />
+  return <canvas ref={ref} />
 }

@@ -18,12 +18,17 @@ export const DefaultLayout = ({
   const maxWidth = 1200
 
   return (
-    <>
+    <div className="vh-100 w-100">
       {loading && <Head {...{ ...head, title: '読み込み中...' }} />}
       {!loading && <Head {...head} />}
       <Header maxWidth={maxWidth} sticky={headerSticky} />
-      <div className="d-flex my-3 mx-auto" style={{ maxWidth }}>
-        <main className="flex-grow-1 mw-100 h-100 px-2 px-sm-3">
+      <div
+        className="d-flex my-3 mx-auto"
+        style={{
+          maxWidth,
+        }}
+      >
+        <main className="flex-grow-1 mw-100 px-2 px-sm-3">
           {!loading && <>{children}</>}
           {loading && (
             <div className="w-100 my-3 text-center">
@@ -34,6 +39,6 @@ export const DefaultLayout = ({
           )}
         </main>
       </div>
-    </>
+    </div>
   )
 }
