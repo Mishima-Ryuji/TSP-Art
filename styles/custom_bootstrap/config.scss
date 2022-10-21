@@ -1,0 +1,19 @@
+// Configuration
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/maps';
+@import '~bootstrap/scss/mixins';
+
+// cssgridを有効化
+$enable-grid-classes: true; // 既存のgrid（row, col）も無効にしない
+$enable-cssgrid: true;
+
+// 字の大きさを追加
+$custom-font-sizes: (
+  7: 0.75rem,
+);
+$font-sizes: map-merge($font-sizes, $custom-font-sizes);
+
+$link-decoration: none;
+
+@import '~bootstrap/scss/utilities';

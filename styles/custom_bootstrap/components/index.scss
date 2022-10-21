@@ -1,0 +1,108 @@
+// Layout & components
+
+// Default
+@import "~bootstrap/scss/root";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/images";
+@import "~bootstrap/scss/containers";
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/tables";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/dropdown";
+@import "~bootstrap/scss/button-group";
+@import "~bootstrap/scss/nav";
+@import "~bootstrap/scss/navbar";
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/accordion";
+@import "~bootstrap/scss/breadcrumb";
+@import "~bootstrap/scss/pagination";
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/alert";
+@import "~bootstrap/scss/progress";
+@import "~bootstrap/scss/list-group";
+@import "~bootstrap/scss/close";
+@import "~bootstrap/scss/toasts";
+@import "~bootstrap/scss/modal";
+@import "~bootstrap/scss/tooltip";
+@import "~bootstrap/scss/popover";
+@import "~bootstrap/scss/carousel";
+@import "~bootstrap/scss/spinners";
+@import "~bootstrap/scss/offcanvas";
+@import "~bootstrap/scss/placeholders";
+
+// Helpers
+@import "~bootstrap/scss/helpers";
+
+// Utilities
+@import "~bootstrap/scss/utilities/api";
+
+// Extensions
+@import "social_buttons";
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+    // borderをレスポンシブ対応
+    .border#{$infix}-0 {
+      border-width: 0px !important;
+    }
+    .border#{$infix}-1 {
+      border-width: 1px !important;
+    }
+
+    // gridのカラムをレスポンシブで調整可能に
+    .g#{$infix}-cols-1 {
+      --bs-columns: 1;
+    }
+    .g#{$infix}-cols-2 {
+      --bs-columns: 2;
+    }
+  }
+}
+
+@each $n in 1, 2, 3, 4, 5 {
+  .text-truncate-#{$n} {
+    display: -webkit-box;
+    -webkit-line-clamp: $n;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+.lh-0 {
+  line-height: 0 !important;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none; // IE, Edge 対応
+  scrollbar-width: none; // Firefox 対応
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari 対応
+  }
+}
+
+// SVGをを指定した大きさで表示するためのラッパー
+// .svg-wrapperの親要素に横幅と縦幅を指定する
+.svg-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Overrides
+.btn-link {
+  box-shadow: none !important;
+  text-decoration: none;
+  padding: 0;
+  line-height: 1;
+}
