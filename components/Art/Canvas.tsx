@@ -1,4 +1,4 @@
-import { TTwoOpt } from 'lib/twoOpt/TTwoOpt'
+import { TTwoOptWithNL } from 'lib/twoOptWithNL/TTwoOptWithNL'
 import { useEffect, useRef, useState } from 'react'
 
 type Props = {
@@ -7,14 +7,14 @@ type Props = {
   onFinish: (tourHistory: number[][]) => void
 }
 
-const INTERVAL = 10
+const INTERVAL = 500
 
 const NUM_OF_CITIES = 10000
 
 export const ArtCanvas = ({ onFinish: handleFinish, imagePath }: Props) => {
   const ref = useRef<HTMLCanvasElement>(null!)
 
-  const searchInstance = useRef<TTwoOpt>(null!)
+  const searchInstance = useRef<TTwoOptWithNL>(null!)
   const citiesRef = useRef<number[][]>([])
   const [currentTour, setCurrentTour] = useState<number[]>([])
   const tourHistory = useRef<number[][]>([])
@@ -32,25 +32,29 @@ export const ArtCanvas = ({ onFinish: handleFinish, imagePath }: Props) => {
     ctx.drawImage(image, 0, 0)
 
     // 画像の各ピクセルをグレースケールに変換する
-    let rgbSum = 0
+    let reverseRgbSum = 0
     const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height)
     for (let y = 0; y < pixels.height; y++) {
       for (let x = 0; x < pixels.width; x++) {
         const i = y * 4 * pixels.width + x * 4
         const rgb = parseInt(
-          `${(pixels.data[i] + pixels.data[i + 1] + pixels.data[i + 2]) / 3}`,
+          `${
+            0.3 * pixels.data[i] +
+            0.59 * pixels.data[i + 1] +
+            0.11 * pixels.data[i + 2]
+          }`,
           10
         )
         pixels.data[i] = rgb
         pixels.data[i + 1] = rgb
         pixels.data[i + 2] = rgb
-        rgbSum += rgb
+        reverseRgbSum += 255 - rgb
       }
     }
 
     let alpha = 1
-    if (rgbSum / 255 > NUM_OF_CITIES) {
-      alpha = NUM_OF_CITIES / (rgbSum / 255)
+    if (reverseRgbSum / 255 > NUM_OF_CITIES) {
+      alpha = NUM_OF_CITIES / (reverseRgbSum / 255)
     }
 
     // 都市データを作成する
@@ -58,7 +62,7 @@ export const ArtCanvas = ({ onFinish: handleFinish, imagePath }: Props) => {
     for (let y = 0; y < pixels.height; y++) {
       for (let x = 0; x < pixels.width; x++) {
         const i = y * 4 * pixels.width + x * 4
-        if (Math.random() < (alpha * pixels.data[i]) / 255) {
+        if (Math.random() < (alpha * (255 - pixels.data[i])) / 255) {
           cities.push([x, y])
         }
       }
@@ -68,7 +72,7 @@ export const ArtCanvas = ({ onFinish: handleFinish, imagePath }: Props) => {
     ctx.putImageData(pixels, 0, 0, 0, 0, pixels.width, pixels.height)
 
     // 都市データをTwoOptに登録
-    searchInstance.current = new TTwoOpt(INTERVAL, cities)
+    searchInstance.current = new TTwoOptWithNL(INTERVAL, cities)
 
     const initTour = searchInstance.current.initialize()
     setCurrentTour(initTour)
@@ -92,7 +96,7 @@ export const ArtCanvas = ({ onFinish: handleFinish, imagePath }: Props) => {
         ctx.lineTo(citiesRef.current[cityId][0], citiesRef.current[cityId][1])
     }
     ctx.strokeStyle = 'black'
-    ctx.lineWidth = 0.1
+    ctx.lineWidth = 2.0
     ctx.stroke()
     if (searchInstance.current.isFinished()) {
       handleFinish(tourHistory.current)
