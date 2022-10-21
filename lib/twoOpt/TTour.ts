@@ -102,6 +102,17 @@ export class TTour {
 	getTourLength() : number {
 		return this.fTourLength;
 	}
+
+	getTour(): number[] {
+		return this.fCitiesTour;
+	}
+
+	setTour(tour: number[]): void {
+		this.fCitiesTour = tour;
+		for (let i: number = 0; i< this.fTSPMap.getDimension(); ++i) {
+			this.fCityIndicies[this.fCitiesTour[i]] =i;
+		}
+	}
 }
 
 function getRandomInt(max: number) {

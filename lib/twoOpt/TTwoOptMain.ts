@@ -16,7 +16,7 @@ export class TTwoOptMain {
 
 		let tspmap: TTSPMap = new TTSPMap(coordinates);
 		let tour: TTour = new TTour(tspmap);
-		let twoopt: TTwoOpt = new TTwoOpt(tour);
+		let twoopt: TTwoOpt = new TTwoOpt(1, coordinates);
 		twoopt.run();
 	  console.log(`${tour.getTourLength()}`);
 	}
